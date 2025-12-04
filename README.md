@@ -1,4 +1,4 @@
-# CLI Packet Analyzer - Kali Linux Edition
+# CLI Packet Analyzer
 
 **Author**: Ashmith Maddala
 
