@@ -6,7 +6,7 @@ import subprocess
 import sys
 from typing import Callable, Optional, List, Dict, Any
 
-from scapy.all import sniff, rdpcap, conf
+from scapy.all import sniff, rdpcap, conf, PcapWriter
 
 from .dissectors import dissect_packet
 from .output import PacketOutput
@@ -32,7 +32,10 @@ class PacketCapture:
 
         for iface in sorted(interfaces):
             info = self.get_interface_info(iface)
-            desc = info.get('description', '') if info else ''
+            # Scapy's conf.ifaces entries are objects, not dicts
+            desc = ''
+            if info is not None:
+                desc = getattr(info, 'description', '') or getattr(info, 'name', '') or ''
 
             # Add helpful descriptions for common Kali interfaces
             kali_desc = self._get_kali_interface_description(iface)
@@ -40,7 +43,7 @@ class PacketCapture:
                 desc = f"{desc} ({kali_desc})" if desc else kali_desc
 
             status = self._get_interface_status(iface)
-            print("20")
+            print(f"  {iface:<12} {status:<8} {desc}")
 
         print()
         print("Common Kali Linux interfaces:")
@@ -56,7 +59,8 @@ class PacketCapture:
                     iface: str,
                     count: int = 0,
                     bpf_filter: Optional[str] = None,
-                    output_handler: Optional[PacketOutput] = None) -> None:
+                    output_handler: Optional[PacketOutput] = None,
+                    write_pcap: Optional[str] = None) -> None:
         """
         Capture packets live from an interface.
 
@@ -65,9 +69,17 @@ class PacketCapture:
             count: Number of packets to capture (0 = unlimited)
             bpf_filter: BPF filter string
             output_handler: Output handler for processed packets
+            write_pcap: Path to write captured packets to PCAP file
         """
+        pcap_writer = None
+        if write_pcap:
+            pcap_writer = PcapWriter(write_pcap, append=True, sync=True)
+            print(f"Writing packets to {write_pcap}")
 
         def packet_handler(pkt):
+            if pcap_writer:
+                pcap_writer.write(pkt)
+                
             packet_data = dissect_packet(pkt, iface=iface)
             if output_handler:
                 output_handler.write_packet(packet_data)
@@ -90,6 +102,9 @@ class PacketCapture:
         except Exception as e:
             print(f"Error during capture: {e}", file=sys.stderr)
             sys.exit(1)
+        finally:
+            if pcap_writer:
+                pcap_writer.close()
 
     def read_pcap(self,
                  filepath: str,

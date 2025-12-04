@@ -1,6 +1,8 @@
 # Sample plugin for CLI Packet Analyzer
 # This demonstrates the plugin architecture for adding custom protocol dissectors
 
+from scapy.layers.inet import TCP
+
 PROTOCOL = "sample"
 
 def dissect(packet_json, raw_packet, layers):

@@ -1,12 +1,22 @@
 # CLI Packet Analyzer - Kali Linux Edition
 
+**Author**: Ashmith Maddala
+
 A powerful command-line packet analyzer optimized for Kali Linux. Capture live network traffic, analyze pcap files, and extract protocol information in human-readable formats with Kali-specific interface detection and tools integration.
 
 ## Features
 
 - **Live Packet Capture**: Capture packets from network interfaces with BPF filters
 - **PCAP File Analysis**: Read and analyze existing packet capture files
-- **Protocol Dissection**: Parse Ethernet, ARP, IPv4, TCP, UDP, ICMP, DNS, and HTTP
+- **Live PCAP Recording**: Save captured packets to a file for evidence collection (`--write`)
+- **Protocol Dissection**: Parse Ethernet, ARP, IPv4, TCP, UDP, ICMP, DNS, HTTP, and TLS
+- **Security Alerts**:
+    - **HTTP Basic Auth**: Detects cleartext credentials
+    - **DNS Tunneling**: Flags suspicious large DNS payloads
+    - **User-Agent Extraction**: Identifies tools and browsers
+- **TLS SNI Extraction**: Identifies visited websites in encrypted traffic
+- **Colorized Output**: Visual highlighting for protocols and alerts
+- **Plugin System**: Extensible architecture for custom protocol dissectors
 - **Kali-Optimized Interface Detection**: Smart recognition of common Kali interfaces (eth0, wlan0, tun0, mon0)
 - **Multiple Output Formats**: Pretty-printed terminal output or JSON Lines for downstream processing
 - **Python Module API**: Import and use programmatically in Python scripts
@@ -23,8 +33,8 @@ A powerful command-line packet analyzer optimized for Kali Linux. Capture live n
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/cli-pcap-analyzer.git
-cd cli-pcap-analyzer
+git clone https://github.com/ashmithhmaddala/cli-packet-analyzer.git
+cd cli-packet-analyzer
 
 # Make install script executable and run it
 chmod +x install.sh
@@ -68,6 +78,9 @@ sudo pcap-analyzer --iface eth0 --count 10
 # Capture HTTP traffic with BPF filter
 sudo pcap-analyzer --iface eth0 --bpf "tcp port 80"
 
+# Capture and save to PCAP file (Evidence Collection)
+sudo pcap-analyzer --iface eth0 --write evidence.pcap
+
 # Analyze PCAP file
 pcap-analyzer --read capture.pcap
 
@@ -97,7 +110,22 @@ analyzer.analyze_pcap('capture.pcap', json_output=True)
 
 ### Pretty Print (Default)
 ```
-2025-10-30T20:15:12.345678Z TCP  10.0.0.5               -> 93.184.216.34           GET / HTTP/1.1
+2025-10-30T20:15:12.345678Z TCP  10.0.0.5               -> 93.184.216.34           GET / HTTP/1.1 (UA: Mozilla/5.0...)
+2025-10-30T20:15:12.456789Z TCP  10.0.0.5               -> 1.1.1.1                 TLS SNI: example.com
+2025-10-30T20:15:12.567890Z UDP  10.0.0.5               -> 8.8.8.8                 DNS Tunneling Suspected (Large Payload) [ALERT]
+```
+
+## Testing
+
+Run the test suite to verify functionality:
+
+```bash
+python -m pytest tests
+```
+
+## License
+
+MIT License - Copyright (c) 2025 Ashmith Maddala
 2025-10-30T20:15:12.456789Z TCP  93.184.216.34           -> 10.0.0.5               HTTP/1.1 200 OK
 ```
 

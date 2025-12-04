@@ -18,7 +18,8 @@ class PacketAnalyzer:
                     count: int = 0,
                     bpf_filter: Optional[str] = None,
                     output_file: Optional[str] = None,
-                    json_output: bool = False) -> None:
+                    json_output: bool = False,
+                    write_pcap: Optional[str] = None) -> None:
         """
         Analyze packets from live capture.
 
@@ -28,9 +29,10 @@ class PacketAnalyzer:
             bpf_filter: BPF filter expression
             output_file: Output file path (None for stdout)
             json_output: True for JSON output, False for pretty print
+            write_pcap: Path to write captured packets to PCAP file
         """
         with PacketOutput(output_file, json_output) as output:
-            self.capture.capture_live(interface, count, bpf_filter, output)
+            self.capture.capture_live(interface, count, bpf_filter, output, write_pcap)
 
     def analyze_pcap(self,
                     filepath: str,
@@ -48,17 +50,11 @@ class PacketAnalyzer:
             self.capture.read_pcap(filepath, output)
 
     def list_interfaces(self) -> None:
-        """List available network interfaces."""
+        """List available network interfaces (delegates to capture)."""
         interfaces = self.capture.list_interfaces()
         if not interfaces:
             print("No interfaces found")
             return
-
-        print("Available interfaces:")
-        for iface in interfaces:
-            info = self.capture.get_interface_info(iface)
-            desc = info.get('description', '') if info else ''
-            print(f"  {iface}: {desc}")
 
 
 # Convenience functions for direct use

@@ -15,7 +15,7 @@ Usage:
 """
 
 __version__ = "1.0.0"
-__author__ = "CLI Packet Analyzer Team"
+__author__ = "Ashmith Maddala"
 
 # Main classes
 from .analyzer import PacketAnalyzer, analyze_live, analyze_pcap, list_interfaces

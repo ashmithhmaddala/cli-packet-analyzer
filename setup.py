@@ -14,12 +14,12 @@ long_description = (this_directory / "README.md").read_text()
 setup(
     name="cli-pcap-analyzer",
     version="1.0.0",
-    author="CLI Packet Analyzer Team",
-    author_email="",
+    author="Ashmith Maddala",
+    author_email="ashmithhmaddala@gmail.com",
     description="Advanced CLI packet analyzer for Kali Linux with protocol dissection and export capabilities",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/your-repo/cli-pcap-analyzer",
+    url="https://github.com/ashmithhmaddala/cli-packet-analyzer",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",

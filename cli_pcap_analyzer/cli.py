@@ -11,6 +11,24 @@ from .analyzer import PacketAnalyzer
 from .capture import require_root_warning
 
 
+def print_banner():
+    """Print the ASCII art banner."""
+    banner = r"""
+ /$$$$$$  /$$       /$$$$$$       /$$$$$$$                     /$$                   /$$            /$$$$$$                      /$$                                        
+ /$$__  $$| $$      |_  $$_/      | $$__  $$                   | $$                  | $$           /$$__  $$                    | $$                                        
+| $$  \__/| $$        | $$        | $$  \ $$ /$$$$$$   /$$$$$$$| $$   /$$  /$$$$$$  /$$$$$$        | $$  \ $$ /$$$$$$$   /$$$$$$ | $$ /$$   /$$ /$$$$$$$$  /$$$$$$   /$$$$$$ 
+| $$      | $$        | $$        | $$$$$$$/|____  $$ /$$_____/| $$  /$$/ /$$__  $$|_  $$_/        | $$$$$$$$| $$__  $$ |____  $$| $$| $$  | $$|____ /$$/ /$$__  $$ /$$__  $$
+| $$      | $$        | $$        | $$____/  /$$$$$$$| $$      | $$$$$$/ | $$$$$$$$  | $$          | $$__  $$| $$  \ $$  /$$$$$$$| $$| $$  | $$   /$$$$/ | $$$$$$$$| $$  \__/
+| $$    $$| $$        | $$        | $$      /$$__  $$| $$      | $$_  $$ | $$_____/  | $$ /$$      | $$  | $$| $$  | $$ /$$__  $$| $$| $$  | $$  /$$__/  | $$_____/| $$      
+|  $$$$$$/| $$$$$$$$ /$$$$$$      | $$     |  $$$$$$$|  $$$$$$$| $$ \  $$|  $$$$$$$  |  $$$$/      | $$  | $$| $$  | $$|  $$$$$$$| $$|  $$$$$$$ /$$$$$$$$|  $$$$$$$| $$      
+ \______/ |________/|______/      |__/      \_______/ \_______/|__/  \__/ \_______/   \___/        |__/  |__/|__/  |__/ \_______/|__/ \____  $$|________/ \_______/|__/      
+                                                                                                                                      /$$  | $$                              
+                                                                                                                                     |  $$$$$$/                              
+                                                                                                                                      \______/                               
+"""
+    print(banner)
+
+
 def create_parser() -> argparse.ArgumentParser:
     """Create command line argument parser."""
     parser = argparse.ArgumentParser(
@@ -77,6 +95,12 @@ Common Kali interfaces: eth0, wlan0, tun0, mon0
     )
 
     parser.add_argument(
+        "--write", "-w",
+        metavar="PCAP_FILE",
+        help="write captured packets to PCAP file"
+    )
+
+    parser.add_argument(
         "--verbose", "-v",
         action="store_true",
         help="verbose output"
@@ -87,6 +111,7 @@ Common Kali interfaces: eth0, wlan0, tun0, mon0
 
 def main() -> None:
     """Main CLI entry point."""
+    print_banner()
     parser = create_parser()
     args = parser.parse_args()
 
@@ -118,7 +143,8 @@ def main() -> None:
                 count=args.count,
                 bpf_filter=args.bpf,
                 output_file=args.json_out,
-                json_output=json_output
+                json_output=json_output,
+                write_pcap=args.write
             )
 
     except KeyboardInterrupt:
